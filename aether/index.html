@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aether — Ab Creative World</title>
+  <meta name="description" content="An interactive particle field that swirls toward the cursor. A studio drop from Ab Creative World." />
+  <meta name="theme-color" content="#09090b" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #09090b;
+      --fg: #f4f4f5;
+      --card: #121214;
+      --muted: #a1a1aa;
+      --primary: #e4e4e7;
+      --primary-fg: #09090b;
+      --border: #2a2a30;
+      --ring: #c8ccd4;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Manrope, "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      display: block;
+    }
+    .vignette {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 42%, color-mix(in oklab, var(--bg) 55%, transparent) 100%);
+    }
+    .panel {
+      pointer-events: auto;
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 10;
+      max-height: min(78dvh, 36rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: color-mix(in oklab, var(--card) 90%, transparent);
+      color: var(--fg);
+      box-shadow: 0 12px 40px -24px rgb(0 0 0 / 0.7);
+      backdrop-filter: blur(12px);
+    }
+    @media (min-width: 768px) {
+      .panel {
+        left: 20px;
+        top: 20px;
+        right: auto;
+        bottom: auto;
+        width: 320px;
+      }
+    }
+    .head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+    }
+    .head a.back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .head a.back:hover { color: var(--fg); }
+    .title { font-family: Syne, "Segoe UI", sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.03em; margin: 4px 0 0; }
+    .sub { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+    .toggle {
+      margin-left: auto;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--fg);
+      display: none;
+    }
+    @media (max-width: 767px) { .toggle { display: inline-flex; align-items: center; justify-content: center; } }
+    .body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 250ms cubic-bezier(0.22, 1, 0.36, 1); }
+    .body[data-open="true"] { grid-template-rows: 1fr; }
+    @media (min-width: 768px) { .body { grid-template-rows: 1fr; } }
+    .clip { min-height: 0; overflow: hidden; }
+    .inner { display: flex; flex-direction: column; gap: 20px; padding: 0 16px 16px; max-height: 24rem; overflow-y: auto; }
+    @media (min-width: 768px) { .inner { max-height: none; } }
+    .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    label { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; }
+    .val { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; accent-color: var(--primary); }
+    .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .swatch {
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #1a1a1e;
+    }
+    .swatch[aria-pressed="true"] { border-color: var(--primary); box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 70%, transparent); }
+    .ice { background: #7dd3fc; }
+    .ember { background: #fb923c; }
+    .moss { background: #86efac; }
+    .prism { background: #67e8f9; }
+    .silver { background: #d4d4d8; }
+    .void { background: #070708; }
+    .ink { background: #0a121c; }
+    .graphite { background: #161618; }
+    .abyss { background: #02030a; }
+    .parchment { background: #e4ddd0; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn {
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--fg);
+      font: 500 14px Manrope, sans-serif;
+    }
+    .btn:hover { background: #1a1a1e; }
+    .btn.primary { grid-column: 1 / -1; background: var(--primary); color: var(--primary-fg); border-color: transparent; }
+    .btn.primary:hover { filter: brightness(0.95); }
+    hr { border: 0; border-top: 1px solid var(--border); margin: 0; }
+    @media (prefers-reduced-motion: reduce) { .body { transition: none; } }
+  </style>
+</head>
+<body>
+  <h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Aether — interactive particle field</h1>
+  <canvas id="field" aria-label="Interactive particle field. Move the pointer to swirl particles, click or tap to burst."></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <aside class="panel">
+    <div class="head">
+      <div>
+        <a class="back" href="/">Ab Creative World</a>
+        <p class="title">Aether</p>
+        <p class="sub">Drag to swirl · Click to burst</p>
+      </div>
+      <button class="toggle" id="toggle" type="button" aria-expanded="false" aria-controls="controls" aria-label="Show controls">▾</button>
+    </div>
+    <div class="body" id="controls" data-open="false">
+      <div class="clip">
+        <div class="inner">
+          <hr />
+          <div>
+            <div class="row"><label for="count">Particles</label><span class="val" id="countVal">2,400</span></div>
+            <input id="count" type="range" min="400" max="6000" step="100" value="2400" aria-label="Particle count" />
+          </div>
+          <div>
+            <div class="row"><label for="force">Force</label><span class="val" id="forceVal">1.20×</span></div>
+            <input id="force" type="range" min="0.25" max="3" step="0.05" value="1.2" aria-label="Attraction force" />
+          </div>
+          <div>
+            <div class="row"><label for="trail">Trails</label><span class="val" id="trailVal">Medium</span></div>
+            <input id="trail" type="range" min="0" max="100" step="1" value="34" aria-label="Trail length" />
+          </div>
+          <div>
+            <label>Color</label>
+            <div class="swatches" id="palettes"></div>
+          </div>
+          <div>
+            <label>Background</label>
+            <div class="swatches" id="backgrounds"></div>
+          </div>
+          <div class="actions">
+            <button class="btn" id="clear" type="button">Clear</button>
+            <button class="btn" id="reset" type="button">Reset</button>
+            <button class="btn primary" id="download" type="button">Download screenshot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <script>
+(function () {
+  const MAX = 6000;
+  const BG = { void: "#070708", ink: "#0a121c", graphite: "#161618", abyss: "#02030a", parchment: "#e4ddd0" };
+  const PALETTES = [
+    { id: "ice", label: "Ice", cls: "ice" },
+    { id: "ember", label: "Ember", cls: "ember" },
+    { id: "moss", label: "Moss", cls: "moss" },
+    { id: "prism", label: "Prism", cls: "prism" },
+    { id: "silver", label: "Silver", cls: "silver" },
+  ];
+  const BACKGROUNDS = [
+    { id: "void", label: "Void", cls: "void" },
+    { id: "ink", label: "Ink", cls: "ink" },
+    { id: "graphite", label: "Graphite", cls: "graphite" },
+    { id: "abyss", label: "Abyss", cls: "abyss" },
+    { id: "parchment", label: "Parchment", cls: "parchment" },
+  ];
+  const DEFAULTS = { count: 2400, force: 1.2, trail: 34, palette: "ice", background: "void" };
+  const KEY = "aether-field-v1";
+
+  function hexToRgb(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function hueFor(palette, seed, speed, time) {
+    const t = Math.min(speed / 420, 1);
+    if (palette === "ice") return 172 + seed * 28 + t * 18;
+    if (palette === "ember") return 8 + seed * 26 + t * 14;
+    if (palette === "moss") return 96 + seed * 38 + t * 12;
+    if (palette === "prism") return (seed * 360 + time * 28 + t * 40) % 360;
+    return 220;
+  }
+  function satFor(palette, speed) {
+    const t = Math.min(speed / 420, 1);
+    if (palette === "silver") return 6 + t * 8;
+    if (palette === "prism") return 62 + t * 18;
+    return 58 + t * 22;
+  }
+
+  class Engine {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+      this.x = new Float32Array(MAX);
+      this.y = new Float32Array(MAX);
+      this.vx = new Float32Array(MAX);
+      this.vy = new Float32Array(MAX);
+      this.seed = new Float32Array(MAX);
+      for (let i = 0; i < MAX; i++) this.seed[i] = Math.random();
+      this.count = 2400;
+      this.force = 1.2;
+      this.trail = 34;
+      this.palette = "ice";
+      this.background = "void";
+      this.cssW = 1;
+      this.cssH = 1;
+      this.pointerX = 0;
+      this.pointerY = 0;
+      this.pointerVx = 0;
+      this.pointerVy = 0;
+      this.lastPointerX = 0;
+      this.lastPointerY = 0;
+      this.hasPointer = false;
+      this.pointerDown = false;
+      this.hold = 0;
+      this.attractX = 0;
+      this.attractY = 0;
+      this.running = false;
+      this.lastTs = 0;
+      this.time = 0;
+      this.reduced = false;
+      this.rings = Array.from({ length: 12 }, () => ({ x: 0, y: 0, r: 0, vr: 0, life: 0, hue: 0, active: false }));
+      this.ringI = 0;
+      this.bgRgb = [7, 7, 8];
+      this.additive = true;
+    }
+    setSettings(s) {
+      if (s.force != null) this.force = s.force;
+      if (s.trail != null) this.trail = s.trail;
+      if (s.palette != null) this.palette = s.palette;
+      if (s.background != null) {
+        this.background = s.background;
+        this.syncBackground();
+      }
+      if (s.count != null) this.setCount(s.count);
+    }
+    setPointer(x, y, down, inside) {
+      if (inside) {
+        this.pointerX = x;
+        this.pointerY = y;
+        this.hasPointer = true;
+      } else {
+        this.hasPointer = false;
+        this.pointerVx = 0;
+        this.pointerVy = 0;
+      }
+      const wasDown = this.pointerDown;
+      this.pointerDown = down && inside;
+      if (this.pointerDown && !wasDown) this.burst(x, y);
+    }
+    clear() {
+      this.spawnAll();
+      this.fillSolid();
+    }
+    download() {
+      this.canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "aether-" + stamp + ".png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    }
+    resize() {
+      const rect = this.canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const cssW = Math.max(1, rect.width);
+      const cssH = Math.max(1, rect.height);
+      const pxW = Math.max(1, Math.floor(cssW * dpr));
+      const pxH = Math.max(1, Math.floor(cssH * dpr));
+      const sizeChanged = this.canvas.width !== pxW || this.canvas.height !== pxH;
+      if (sizeChanged) {
+        this.canvas.width = pxW;
+        this.canvas.height = pxH;
+      }
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const first = this.cssW <= 1 && this.cssH <= 1;
+      this.cssW = cssW;
+      this.cssH = cssH;
+      if (!this.hasPointer) {
+        this.attractX = cssW * 0.5;
+        this.attractY = cssH * 0.5;
+        this.pointerX = this.attractX;
+        this.pointerY = this.attractY;
+      }
+      if (first) {
+        this.syncBackground();
+        this.spawnAll();
+        this.fillSolid();
+      } else if (sizeChanged) this.fillSolid();
+    }
+    start() {
+      if (this.running) return;
+      this.running = true;
+      this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      this.resize();
+      for (let i = 0; i < 48; i++) {
+        this.step(1 / 60);
+        this.draw();
+      }
+      this.lastTs = performance.now();
+      const loop = (now) => {
+        if (!this.running) return;
+        requestAnimationFrame(loop);
+        let dt = (now - this.lastTs) / 1000;
+        this.lastTs = now;
+        if (dt > 0.1) dt = 0.1;
+        this.step(dt);
+        this.draw();
+      };
+      requestAnimationFrame(loop);
+    }
+    setCount(n) {
+      const next = Math.max(1, Math.min(MAX, Math.round(n)));
+      const prev = this.count;
+      this.count = next;
+      if (next > prev) for (let i = prev; i < next; i++) this.spawn(i);
+    }
+    syncBackground() {
+      const hex = BG[this.background];
+      this.bgRgb = hexToRgb(hex);
+      const [r, g, b] = this.bgRgb;
+      this.additive = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.45;
+      this.canvas.style.background = hex;
+    }
+    spawnAll() { for (let i = 0; i < this.count; i++) this.spawn(i); }
+    spawn(i) {
+      const w = this.cssW, h = this.cssH;
+      const seed = this.seed[i];
+      const ang = seed * Math.PI * 2 + i * 0.618;
+      const radius = Math.sqrt(seed) * Math.min(w, h) * 0.42;
+      const x = w * 0.5 + Math.cos(ang) * radius;
+      const y = h * 0.5 + Math.sin(ang) * radius;
+      const orbit = 28 + seed * 55;
+      this.x[i] = x; this.y[i] = y;
+      this.vx[i] = -Math.sin(ang) * orbit;
+      this.vy[i] = Math.cos(ang) * orbit;
+    }
+    burst(x, y) {
+      const force = this.force;
+      for (let i = 0; i < this.count; i++) {
+        const dx = this.x[i] - x, dy = this.y[i] - y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > 220 * 220) continue;
+        const d = Math.sqrt(d2) + 0.001;
+        const falloff = (1 - d / 220) * force;
+        const inv = 1 / d;
+        const ux = dx * inv, uy = dy * inv;
+        const kick = 420 * falloff;
+        this.vx[i] += -uy * kick * 1.15 + ux * kick * 0.22;
+        this.vy[i] += ux * kick * 1.15 + uy * kick * 0.22;
+      }
+      const ring = this.rings[this.ringI++ % this.rings.length];
+      ring.active = true; ring.x = x; ring.y = y; ring.r = 8; ring.vr = 280; ring.life = 1;
+      ring.hue = hueFor(this.palette, 0.4, 300, this.time);
+    }
+    step(dt) {
+      this.time += dt;
+      const w = this.cssW, h = this.cssH, cx = w * 0.5, cy = h * 0.5;
+      this.pointerVx = this.pointerX - this.lastPointerX;
+      this.pointerVy = this.pointerY - this.lastPointerY;
+      this.lastPointerX = this.pointerX;
+      this.lastPointerY = this.pointerY;
+      const holdTarget = this.pointerDown ? 1 : 0;
+      this.hold += (holdTarget - this.hold) * (1 - Math.exp(-(this.pointerDown ? 14 : 8) * dt));
+      if (this.hasPointer) { this.attractX = this.pointerX; this.attractY = this.pointerY; }
+      else {
+        const k = 1 - Math.exp(-3.2 * dt);
+        this.attractX += (cx - this.attractX) * k;
+        this.attractY += (cy - this.attractY) * k;
+      }
+      const swirlScale = this.reduced ? 0.4 : 1;
+      const force = this.force * (1 + this.hold * 1.35);
+      const damp = Math.exp(-1.35 * dt);
+      const noiseAmp = this.reduced ? 4 : 10;
+      const time = this.time, ax = this.attractX, ay = this.attractY;
+      const pvx = this.pointerVx / Math.max(dt, 1 / 120);
+      const pvy = this.pointerVy / Math.max(dt, 1 / 120);
+      for (let i = 0; i < this.count; i++) {
+        let x = this.x[i], y = this.y[i], vx = this.vx[i], vy = this.vy[i];
+        const seed = this.seed[i];
+        const dx = ax - x, dy = ay - y;
+        const d = Math.sqrt(dx * dx + dy * dy) + 0.0008;
+        const inv = 1 / d;
+        const ux = dx * inv, uy = dy * inv, tx = -uy, ty = ux;
+        const attract = (force * 210) / (1 + d * 0.011);
+        const swirl = (force * 168 * swirlScale) / (1 + d * 0.0075);
+        vx += (ux * attract + tx * swirl) * dt;
+        vy += (uy * attract + ty * swirl) * dt;
+        if (this.hasPointer && d < 90) {
+          const wFall = 1 - d / 90;
+          vx += pvx * 0.18 * wFall * dt * 60;
+          vy += pvy * 0.18 * wFall * dt * 60;
+        }
+        vx += Math.sin(x * 0.012 + time * 0.7 + seed * 6) * noiseAmp * dt;
+        vy += Math.cos(y * 0.012 + time * 0.55 + seed * 4) * noiseAmp * dt;
+        vx *= damp; vy *= damp;
+        x += vx * dt; y += vy * dt;
+        if (x < -12) x = w + 12; else if (x > w + 12) x = -12;
+        if (y < -12) y = h + 12; else if (y > h + 12) y = -12;
+        this.x[i] = x; this.y[i] = y; this.vx[i] = vx; this.vy[i] = vy;
+      }
+      for (const ring of this.rings) {
+        if (!ring.active) continue;
+        ring.r += ring.vr * dt;
+        ring.life -= dt * 1.35;
+        if (ring.life <= 0) ring.active = false;
+      }
+    }
+    fillSolid() {
+      const ctx = this.ctx;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = BG[this.background];
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    draw() {
+      const ctx = this.ctx, w = this.cssW, h = this.cssH;
+      const [r, g, b] = this.bgRgb;
+      const fade = 0.045 + (this.trail / 100) * 0.38;
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + fade + ")";
+      ctx.fillRect(0, 0, w, h);
+      if (this.additive) ctx.globalCompositeOperation = "lighter";
+      const dark = this.additive;
+      for (let i = 0; i < this.count; i++) {
+        const speed = Math.hypot(this.vx[i], this.vy[i]);
+        const t = Math.min(speed / 380, 1);
+        const seed = this.seed[i];
+        const hue = hueFor(this.palette, seed, speed, this.time);
+        const sat = satFor(this.palette, speed);
+        const light = dark ? 46 + t * 38 + seed * 6 : 28 + t * 18;
+        const size = 1.05 + t * 2.55 + seed * 0.75;
+        const x = this.x[i], y = this.y[i];
+        const glowA = dark ? 0.2 + t * 0.28 : 0.14 + t * 0.12;
+        ctx.fillStyle = "hsla(" + hue.toFixed(1) + "," + sat.toFixed(0) + "%," + light.toFixed(0) + "%," + glowA.toFixed(2) + ")";
+        ctx.beginPath(); ctx.arc(x, y, size * 3.1, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "hsla(" + hue.toFixed(1) + "," + sat.toFixed(0) + "%," + Math.min(light + 12, 96).toFixed(0) + "%,0.92)";
+        ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+      }
+      this.drawWell(ctx);
+      for (const ring of this.rings) {
+        if (!ring.active) continue;
+        ctx.strokeStyle = "hsla(" + ring.hue + ",70%,70%," + (ring.life * 0.45).toFixed(2) + ")";
+        ctx.lineWidth = 1.4 + ring.life;
+        ctx.beginPath(); ctx.arc(ring.x, ring.y, ring.r, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = "source-over";
+    }
+    drawWell(ctx) {
+      if (!this.hasPointer && this.hold < 0.02) return;
+      const x = this.attractX, y = this.attractY;
+      const pulse = 16 + Math.sin(this.time * 3.2) * 2 + this.hold * 10;
+      const hue = hueFor(this.palette, 0.5, 200, this.time);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(this.time * 0.9);
+      ctx.strokeStyle = "hsla(" + hue + ",70%,72%," + (0.22 + this.hold * 0.28) + ")";
+      ctx.lineWidth = 1.15;
+      ctx.beginPath(); ctx.arc(0, 0, pulse, 0.15, Math.PI * 1.55); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  const canvas = document.getElementById("field");
+  const engine = new Engine(canvas);
+  let state = { ...DEFAULTS };
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) Object.assign(state, JSON.parse(raw));
+  } catch (e) {}
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  engine.setSettings(state);
+  engine.start();
+  new ResizeObserver(() => engine.resize()).observe(canvas);
+
+  function point(e) {
+    const r = canvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+  canvas.addEventListener("pointermove", (e) => {
+    const p = point(e); engine.setPointer(p.x, p.y, (e.buttons & 1) === 1, true);
+  });
+  canvas.addEventListener("pointerdown", (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    const p = point(e); engine.setPointer(p.x, p.y, true, true);
+  });
+  canvas.addEventListener("pointerup", (e) => {
+    const p = point(e); engine.setPointer(p.x, p.y, false, true);
+  });
+  canvas.addEventListener("pointerleave", (e) => {
+    const p = point(e); engine.setPointer(p.x, p.y, false, false);
+  });
+  canvas.addEventListener("pointercancel", (e) => {
+    const p = point(e); engine.setPointer(p.x, p.y, false, false);
+  });
+
+  const countEl = document.getElementById("count");
+  const forceEl = document.getElementById("force");
+  const trailEl = document.getElementById("trail");
+  const countVal = document.getElementById("countVal");
+  const forceVal = document.getElementById("forceVal");
+  const trailVal = document.getElementById("trailVal");
+  function trailLabel(n) { return n < 34 ? "Long" : n > 66 ? "Short" : "Medium"; }
+  function renderVals() {
+    countEl.value = state.count;
+    forceEl.value = state.force;
+    trailEl.value = state.trail;
+    countVal.textContent = Number(state.count).toLocaleString("en-US");
+    forceVal.textContent = Number(state.force).toFixed(2) + "×";
+    trailVal.textContent = trailLabel(state.trail);
+    document.querySelectorAll("#palettes .swatch").forEach((b) => b.setAttribute("aria-pressed", b.dataset.id === state.palette ? "true" : "false"));
+    document.querySelectorAll("#backgrounds .swatch").forEach((b) => b.setAttribute("aria-pressed", b.dataset.id === state.background ? "true" : "false"));
+  }
+  function apply() { engine.setSettings(state); save(); renderVals(); }
+  countEl.addEventListener("input", () => { state.count = Number(countEl.value); apply(); });
+  forceEl.addEventListener("input", () => { state.force = Number(forceEl.value); apply(); });
+  trailEl.addEventListener("input", () => { state.trail = Number(trailEl.value); apply(); });
+
+  function makeSwatches(root, items, key) {
+    items.forEach((item) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "swatch " + item.cls;
+      b.title = item.label;
+      b.setAttribute("aria-label", item.label);
+      b.dataset.id = item.id;
+      b.addEventListener("click", () => { state[key] = item.id; apply(); });
+      root.appendChild(b);
+    });
+  }
+  makeSwatches(document.getElementById("palettes"), PALETTES, "palette");
+  makeSwatches(document.getElementById("backgrounds"), BACKGROUNDS, "background");
+  renderVals();
+
+  document.getElementById("clear").addEventListener("click", () => engine.clear());
+  document.getElementById("reset").addEventListener("click", () => {
+    state = { ...DEFAULTS };
+    apply();
+    engine.clear();
+  });
+  document.getElementById("download").addEventListener("click", () => engine.download());
+
+  const toggle = document.getElementById("toggle");
+  const controls = document.getElementById("controls");
+  toggle.addEventListener("click", () => {
+    const open = controls.getAttribute("data-open") === "true";
+    controls.setAttribute("data-open", open ? "false" : "true");
+    toggle.setAttribute("aria-expanded", open ? "false" : "true");
+    toggle.setAttribute("aria-label", open ? "Show controls" : "Hide controls");
+  });
+})();
+  </script>
+</body>
+</html>
