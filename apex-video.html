@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>APEX TikTok video</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #100f0e;
+      color: #f5e6c8;
+      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+    }
+    h1 { font-size: 1.4rem; letter-spacing: 0.18em; text-align: center; margin: 8px 0 16px; }
+    video {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      border-radius: 18px;
+      background: #000;
+      aspect-ratio: 9/16;
+    }
+    p { max-width: 420px; margin: 14px auto; font-size: 15px; line-height: 1.45; color: #f5e6c8; }
+    .btn {
+      display: block;
+      max-width: 420px;
+      margin: 12px auto 0;
+      text-align: center;
+      background: #d4a017;
+      color: #100f0e;
+      font-weight: 700;
+      padding: 16px;
+      border-radius: 999px;
+      text-decoration: none;
+    }
+    .ghost {
+      background: transparent;
+      color: #d4a017;
+      border: 1px solid #d4a017;
+    }
+  </style>
+</head>
+<body>
+  <h1>APEX</h1>
+  <video id="v" controls playsinline webkit-playsinline preload="metadata" src="./apex-tiktok.mp4"></video>
+  <p><b>To save to your phone:</b> open this page in <b>Safari</b> (not Grok). Play the video, tap Share, then <b>Save Video</b>.</p>
+  <a class="btn" href="./apex-tiktok.mp4">Play the video file</a>
+  <a class="btn ghost" href="https://github.com/Abbytes/abbytes.github.io/releases/download/apex-tiktok-v1/APEX-TikTok.mp4">Download to Files</a>
+</body>
+</html>
