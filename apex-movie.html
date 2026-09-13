@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>APEX Movie · Ab Creative World</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #100f0e;
+      color: #f5e6c8;
+      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+    }
+    h1 { font-size: 1.15rem; letter-spacing: 0.22em; text-align: center; margin: 8px 0 6px; }
+    .sub { text-align: center; font-size: 0.75rem; letter-spacing: 0.28em; text-transform: uppercase; color: #c4b89a; margin-bottom: 16px; }
+    video {
+      display: block;
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      border-radius: 16px;
+      background: #000;
+      aspect-ratio: 16/9;
+    }
+    p { max-width: 640px; margin: 14px auto; font-size: 15px; line-height: 1.45; }
+    .btn {
+      display: block;
+      max-width: 420px;
+      margin: 12px auto 0;
+      text-align: center;
+      background: #d4a017;
+      color: #100f0e;
+      font-weight: 700;
+      padding: 16px;
+      border-radius: 999px;
+      text-decoration: none;
+    }
+    .ghost {
+      background: transparent;
+      color: #d4a017;
+      border: 1px solid #d4a017;
+    }
+  </style>
+</head>
+<body>
+  <h1>APEX</h1>
+  <div class="sub">Ab Creative World</div>
+  <video id="v" controls playsinline webkit-playsinline preload="metadata"
+    src="https://github.com/Abbytes/abbytes.github.io/releases/download/apex-epic-movie-v1/APEX-Epic-Movie.mp4"></video>
+  <p>The studio movie. Unmute if you need to. To save it: open this page in <b>Safari</b>, play, then Share → Save Video.</p>
+  <a class="btn" href="/projects/apex/">Open on the studio site</a>
+  <a class="btn ghost" href="https://github.com/Abbytes/abbytes.github.io/releases/download/apex-epic-movie-v1/APEX-Epic-Movie.mp4">Download the movie</a>
+</body>
+</html>
