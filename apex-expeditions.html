@@ -5,9 +5,316 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>APEX · Expeditions</title>
   <meta name="theme-color" content="#0b0906" />
+  <style>
+    :root {
+      --bg: #0b0906;
+      --fg: #efe6d4;
+      --muted: #9a8f7a;
+      --accent: #d4b56a;
+      --line: #2a2418;
+      --surface: #16130e;
+      --shadowborn: #c4b7a0;
+      --crimson: #b42318;
+      --abyssal: #6f8f8a;
+      --revenant: #cfc6b8;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: Georgia, "Times New Roman", serif; }
+    button { font: inherit; cursor: pointer; }
+    .wrap { min-height: 100dvh; max-width: 28rem; margin: 0 auto; padding: 1.1rem 1rem 3rem; position: relative; }
+    .hero { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; min-height: 11rem; margin-bottom: 1rem; }
+    .hero img { width: 100%; height: 11rem; object-fit: cover; object-position: center 28%; opacity: .72; display: block; }
+    .hero .veil { position: absolute; inset: 0; background: linear-gradient(to top, #0b0906, transparent 55%); }
+    .hero .copy { position: absolute; left: 1rem; right: 1rem; bottom: .85rem; }
+    .kicker { letter-spacing: .42em; font-size: .62rem; color: var(--accent); text-transform: uppercase; }
+    h1 { font-size: 2.4rem; letter-spacing: .18em; margin: .15rem 0 0; font-weight: 500; }
+    .sub { color: #d7ccb6; font-size: .9rem; margin: .35rem 0 0; }
+    .row { display: flex; gap: .45rem; margin-top: .7rem; }
+    .pill { height: .38rem; flex: 1; border-radius: 99px; }
+    .stats { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; margin: .2rem 0 1rem; }
+    .expeditions { display: grid; gap: .55rem; }
+    .ex { text-align: left; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: .8rem; padding: .8rem .9rem; }
+    .ex.on { border-color: var(--accent); background: #1c1811; }
+    .ex b { display: block; letter-spacing: .04em; font-weight: 500; }
+    .ex span { display: block; color: var(--muted); font-size: .78rem; margin-top: .15rem; }
+    .open { width: 100%; margin-top: 1rem; background: var(--accent); color: #1a1408; border: 0; border-radius: .8rem; padding: .95rem; letter-spacing: .08em; text-transform: uppercase; }
+    .tabs { display: flex; gap: .4rem; margin: 1.2rem 0 .7rem; }
+    .tab { flex: 1; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: .6rem; padding: .55rem; font-size: .8rem; }
+    .tab.on { color: var(--fg); border-color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; }
+    .card { position: relative; aspect-ratio: 5/7; border-radius: .7rem; overflow: hidden; border: 1px solid #3a3224; background: #111; }
+    .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card .name { position: absolute; left: 0; right: 0; bottom: 0; padding: .45rem .35rem .3rem; background: linear-gradient(to top, #0b0906, transparent); font-size: .62rem; line-height: 1.15; }
+    .badge { position: absolute; top: .28rem; right: .28rem; background: #0b0906cc; color: var(--accent); font-size: .55rem; letter-spacing: .06em; padding: .12rem .28rem; border-radius: .25rem; }
+    .card.foil { box-shadow: 0 0 0 1px var(--accent); }
+    .card.locked { filter: grayscale(1); opacity: .55; }
+    .empty { color: var(--muted); font-size: .85rem; padding: .4rem 0 1rem; }
+    .rip { position: fixed; inset: 0; background: #0b0906f2; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 1rem; z-index: 20; }
+    .rip.show { display: flex; }
+    .rips { display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; max-width: 22rem; }
+    .rip .card { width: 6.6rem; }
+    .back { width: 6.6rem; aspect-ratio: 5/7; border-radius: .7rem; border: 0; background-size: cover; background-position: center; }
+    .hint { color: var(--muted); margin-top: 1rem; font-size: .85rem; }
+    .done { margin-top: 1rem; background: var(--accent); color: #1a1408; border: 0; border-radius: .7rem; padding: .7rem 1.4rem; letter-spacing: .08em; text-transform: uppercase; }
+    .note { color: var(--muted); font-size: .75rem; margin-top: 1.4rem; line-height: 1.45; }
+  </style>
 </head>
 <body>
-<p>Loading preview…</p>
-<script>location.replace(location.pathname);</script>
+  <div class="wrap">
+    <div class="hero">
+      <img id="titleArt" alt="" />
+      <div class="veil"></div>
+      <div class="copy">
+        <div class="kicker">Collect · Command · Conquer</div>
+        <h1>APEX</h1>
+        <p class="sub">Expedition preview. Rip packs. Keep trophies.</p>
+        <div class="row">
+          <i class="pill" style="background:var(--shadowborn)"></i>
+          <i class="pill" style="background:var(--crimson)"></i>
+          <i class="pill" style="background:var(--abyssal)"></i>
+          <i class="pill" style="background:var(--revenant)"></i>
+        </div>
+      </div>
+    </div>
+    <p class="stats" id="stats"></p>
+    <div class="expeditions" id="exs"></div>
+    <button class="open" id="openBtn">Open Mixed Hunt</button>
+    <div class="tabs">
+      <button class="tab on" data-shelf="play">Play</button>
+      <button class="tab" data-shelf="foils">Foils</button>
+      <button class="tab" data-shelf="relics">Relics</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="note">Local preview. Shards and trophies stay on this phone. Play copies do not change combat power. Relics: First Spear, Matriarch Rex, Leviathan, Vexed King.</p>
+  </div>
+  <div class="rip" id="rip">
+    <div class="rips" id="rips"></div>
+    <p class="hint" id="ripHint">Tap the next card.</p>
+    <button class="done" id="done" hidden>Done</button>
+  </div>
+  <script>
+    const ART = "https://raw.githubusercontent.com/Abbytes/apex-tcg/main";
+    const RELICS = ["first-spear", "matriarch-rex", "abyssal-leviathan", "vexed-king"];
+    const FACTION = { bronze: "shadowborn", blood: "crimson", trench: "abyssal", ash: "revenant" };
+    const EXS = [
+      { id: "mixed", name: "Mixed Hunt", line: "Any tribe. Same odds as the old pack." },
+      { id: "bronze", name: "Bronze Expedition", line: "Shadowborn weighted. Mark+ is Spartan." },
+      { id: "blood", name: "Blood Expedition", line: "Crimson weighted. Mark+ is the pack." },
+      { id: "trench", name: "Trench Expedition", line: "Abyssal weighted. Mark+ is the trench." },
+      { id: "ash", name: "Ash Expedition", line: "Revenant weighted. Mark+ is the dead." }
+    ];
+    const CARDS = [
+      ["spear-initiate","Spear Initiate","shadowborn","common"],
+      ["night-hoplite","Night Hoplite","shadowborn","common"],
+      ["bronze-wall","Bronze Wall","shadowborn","common"],
+      ["shadow-scout","Shadow Scout","shadowborn","rare"],
+      ["phalanx-veteran","Phalanx Veteran","shadowborn","rare"],
+      ["aegis-of-sparta","Aegis of Sparta","shadowborn","rare"],
+      ["spear-volley","Spear Volley","shadowborn","rare"],
+      ["umbral-blade","Umbral Blade","shadowborn","epic"],
+      ["cloaked-strategos","Cloaked Strategos","shadowborn","epic"],
+      ["first-spear","The First Spear","shadowborn","legendary"],
+      ["blood-pup","Blood Pup","crimson","common"],
+      ["pack-raptor","Pack Raptor","crimson","common"],
+      ["blood-frenzy","Blood Frenzy","crimson","common"],
+      ["iron-hide","Iron Hide","crimson","common"],
+      ["bonebreaker","Bonebreaker","crimson","rare"],
+      ["crimson-stalker","Crimson Stalker","crimson","rare"],
+      ["killing-leap","Killing Leap","crimson","rare"],
+      ["horned-titan","Horned Titan","crimson","epic"],
+      ["stampede","Stampede","crimson","epic"],
+      ["matriarch-rex","Crimson Matriarch","crimson","legendary"],
+      ["glowfin","Glowfin","abyssal","common"],
+      ["tide-serpent","Tide Serpent","abyssal","common"],
+      ["shell-plate","Shell Plate","abyssal","common"],
+      ["abyss-lurker","Abyss Lurker","abyssal","rare"],
+      ["drown","Drown","abyssal","rare"],
+      ["tidal-surge","Tidal Surge","abyssal","rare"],
+      ["trench-harpoon","Trench Harpoon","abyssal","rare"],
+      ["kraken-arm","Kraken Arm","abyssal","epic"],
+      ["leviathan-spawn","Leviathan Spawn","abyssal","epic"],
+      ["abyssal-leviathan","Abyssal Leviathan","abyssal","legendary"],
+      ["ash-wisp","Ash Wisp","revenant","common"],
+      ["grave-spearman","Grave Spearman","revenant","common"],
+      ["soul-bind","Soul Bind","revenant","common"],
+      ["death-mark","Death Mark","revenant","common"],
+      ["vengeful-shade","Vengeful Shade","revenant","rare"],
+      ["hex-vengeance","Hex of Vengeance","revenant","rare"],
+      ["grave-warden","Grave Warden","revenant","rare"],
+      ["revenant-captain","Revenant Captain","revenant","epic"],
+      ["echo-of-war","Echo of War","revenant","epic"],
+      ["vexed-king","The Vexed King","revenant","legendary"]
+    ].map(([id,name,faction,rarity]) => ({id,name,faction,rarity}));
+    const KEY = "apex-expeditions-preview-v1";
+    const COST = 100;
+    let kind = "mixed";
+    let shelf = "play";
+    let save = load();
+    document.getElementById("titleArt").src = ART + "/art/title.jpg";
+    function load() {
+      try { const raw = JSON.parse(localStorage.getItem(KEY)); if (raw && raw.collection) return raw; } catch(e) {}
+      const collection = {};
+      CARDS.forEach((c) => { collection[c.id] = (c.rarity === "common" || c.rarity === "rare") ? 2 : 0; });
+      return { shards: 350, collection, foils: {}, trophies: [], packsOpened: 0, relicsThisWeek: 0, week: weekKey() };
+    }
+    function persist() { localStorage.setItem(KEY, JSON.stringify(save)); }
+    function weekKey() {
+      const t = new Date();
+      const d = new Date(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()));
+      const day = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - day);
+      const y0 = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return d.getUTCFullYear() + "-W" + String(Math.ceil(((d.getTime() - y0.getTime()) / 86400000 + 1) / 7)).padStart(2,"0");
+    }
+    function pool(rarity, prefer) {
+      const all = CARDS.filter((c) => c.rarity === rarity);
+      if (!prefer) return all;
+      const tribe = all.filter((c) => c.faction === prefer);
+      return tribe.length ? tribe : all;
+    }
+    function pick(rarity, prefer) {
+      const focused = pool(rarity, prefer);
+      const rest = CARDS.filter((c) => c.rarity === rarity && c.faction !== prefer);
+      const useTribe = !!(prefer && rest.length && Math.random() < 0.7);
+      const bag = (!prefer || useTribe || !rest.length) ? focused : rest;
+      return bag[Math.floor(Math.random() * bag.length)];
+    }
+    function rarePlus(prefer) {
+      const n = Math.random() * 100;
+      if (n < 4) return pick("legendary", prefer);
+      if (n < 22) return pick("epic", prefer);
+      return pick("rare", prefer);
+    }
+    function roll(k) {
+      const prefer = FACTION[k];
+      const ids = [pick("common", prefer), pick("common", prefer), pick("common", prefer), pick("rare", prefer), rarePlus(prefer)];
+      return ids.map((c, i) => {
+        const foil = Math.random() < 0.08;
+        const relic = i === 4 && foil && c.rarity === "legendary" && RELICS.includes(c.id) && Math.random() < 0.12;
+        return Object.assign({}, c, { foil: foil, relic: relic });
+      });
+    }
+    function apply(pulls) {
+      const week = weekKey();
+      if (save.week !== week) { save.week = week; save.relicsThisWeek = 0; }
+      pulls.forEach((p) => {
+        const max = p.rarity === "legendary" ? 1 : 2;
+        const have = save.collection[p.id] || 0;
+        if (have >= max) save.shards += p.rarity === "legendary" ? 140 : p.rarity === "epic" ? 55 : p.rarity === "rare" ? 20 : 8;
+        else save.collection[p.id] = have + 1;
+        if (p.foil) save.foils[p.id] = (save.foils[p.id] || 0) + 1;
+        let relic = p.relic && save.relicsThisWeek < 1;
+        if (relic) {
+          save.relicsThisWeek += 1;
+          const serial = save.trophies.filter((t) => t.id === p.id && t.kind === "relic").length + 1;
+          save.trophies.push({ id: p.id, kind: "relic", serial: serial, at: Date.now() });
+          p.serial = serial;
+        } else if (p.foil) {
+          save.trophies.push({ id: p.id, kind: "foil", at: Date.now() });
+        }
+        p.relic = relic;
+      });
+      save.packsOpened += 1;
+      persist();
+    }
+    const exs = document.getElementById("exs");
+    EXS.forEach((ex) => {
+      const b = document.createElement("button");
+      b.className = "ex" + (ex.id === kind ? " on" : "");
+      b.innerHTML = "<b>" + ex.name + "</b><span>" + ex.line + "</span>";
+      b.onclick = function() {
+        kind = ex.id;
+        document.querySelectorAll(".ex").forEach((el) => el.classList.remove("on"));
+        b.classList.add("on");
+        document.getElementById("openBtn").textContent = "Open " + ex.name;
+      };
+      exs.appendChild(b);
+    });
+    function renderStats() {
+      const relics = save.trophies.filter((t) => t.kind === "relic").length;
+      const foils = Object.values(save.foils).reduce((a, n) => a + n, 0);
+      document.getElementById("stats").textContent = save.shards + " shards · " + COST + " an expedition · " + foils + " foils · " + relics + " relics";
+    }
+    function renderGrid() {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+      const rows = CARDS.filter((c) => {
+        if (shelf === "foils") return (save.foils[c.id] || 0) > 0;
+        if (shelf === "relics") return save.trophies.some((t) => t.id === c.id && t.kind === "relic");
+        return true;
+      });
+      if (!rows.length) {
+        const p = document.createElement("p");
+        p.className = "empty";
+        p.textContent = shelf === "play" ? "Empty binder." : "Rip expeditions to earn these.";
+        grid.appendChild(p);
+        return;
+      }
+      rows.forEach((c) => {
+        const n = save.collection[c.id] || 0;
+        const foil = (save.foils[c.id] || 0) > 0;
+        const relic = save.trophies.find((t) => t.id === c.id && t.kind === "relic");
+        const el = document.createElement("div");
+        el.className = "card" + (foil ? " foil" : "") + (n === 0 && !foil && !relic ? " locked" : "");
+        el.innerHTML = '<img src="' + ART + "/cards/" + c.id + '.jpg" alt="">' +
+          (relic ? '<span class="badge">RELIC #' + String(relic.serial).padStart(3,"0") + "</span>" : foil ? '<span class="badge">FOIL</span>' : "") +
+          '<div class="name">' + c.name + (n ? " ×" + n : "") + "</div>";
+        grid.appendChild(el);
+      });
+    }
+    document.querySelectorAll(".tab").forEach((t) => {
+      t.onclick = function() {
+        shelf = t.getAttribute("data-shelf");
+        document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === t));
+        renderGrid();
+      };
+    });
+    let opening = [];
+    let revealed = 0;
+    document.getElementById("openBtn").onclick = function() {
+      if (save.shards < COST) return;
+      save.shards -= COST;
+      opening = roll(kind);
+      apply(opening);
+      revealed = -1;
+      const rip = document.getElementById("rip");
+      const box = document.getElementById("rips");
+      box.innerHTML = "";
+      opening.forEach(function(_, i) {
+        const b = document.createElement("button");
+        b.className = "back";
+        b.style.backgroundImage = "url(" + ART + "/art/cardback.jpg)";
+        b.onclick = function() { reveal(i); };
+        box.appendChild(b);
+      });
+      document.getElementById("done").hidden = true;
+      document.getElementById("ripHint").textContent = "Tap the next card.";
+      rip.classList.add("show");
+      renderStats();
+    };
+    function reveal(i) {
+      if (i !== revealed + 1) return;
+      revealed = i;
+      const p = opening[i];
+      const slot = document.getElementById("rips").children[i];
+      const card = document.createElement("div");
+      card.className = "card" + (p.foil ? " foil" : "");
+      card.innerHTML = '<img src="' + ART + "/cards/" + p.id + '.jpg" alt="">' +
+        (p.relic ? '<span class="badge">RELIC #' + String(p.serial).padStart(3,"0") + "</span>" : p.foil ? '<span class="badge">FOIL</span>' : '<span class="badge">' + p.rarity.toUpperCase() + "</span>") +
+        '<div class="name">' + p.name + "</div>";
+      slot.replaceWith(card);
+      if (revealed >= opening.length - 1) {
+        document.getElementById("ripHint").textContent = "";
+        document.getElementById("done").hidden = false;
+      }
+    }
+    document.getElementById("done").onclick = function() {
+      document.getElementById("rip").classList.remove("show");
+      renderGrid();
+      renderStats();
+    };
+    renderStats();
+    renderGrid();
+  </script>
 </body>
 </html>
