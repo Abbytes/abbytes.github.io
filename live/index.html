@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Live Preview — Ab Creative World</title>
-<meta name="description" content="Preview the AB Creative World stream scenes before OBS."/>
+<title>Live — Ab Creative World</title>
+<meta name="description" content="Watch Sparta Adamo live from AB Creative World."/>
 <meta property="og:image" content="https://abbytes.github.io/og-home.png"/>
 <style>
-:root{--gold:#ead9b4;--amber:#ff8a1a;--bg:#050505}
+:root{--gold:#ead9b4;--amber:#ff8a1a}
 *{box-sizing:border-box}
 html,body{margin:0;background:#000;color:#fff;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;height:100%;overflow:hidden}
 a{color:inherit;text-decoration:none}
 body{display:flex;flex-direction:column;height:100dvh}
-topbar, .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:rgba(0,0,0,.72);border-bottom:1px solid rgba(255,255,255,.1);z-index:30}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:rgba(0,0,0,.82);border-bottom:1px solid rgba(255,255,255,.1);z-index:30}
 .brand{font-weight:700}.brand small{margin-left:6px;letter-spacing:.18em;text-transform:uppercase;color:#888;font-size:10px}
-.tabs{display:flex;gap:6px;overflow-x:auto;max-width:62vw}
+.tabs{display:flex;gap:6px;overflow-x:auto;max-width:70vw}
 .tabs button{
   border:1px solid rgba(234,217,180,.25);background:rgba(255,255,255,.05);color:var(--gold);
   border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;letter-spacing:.06em;white-space:nowrap
@@ -23,9 +23,7 @@ topbar, .topbar{display:flex;align-items:center;justify-content:space-between;ga
 .stage{flex:1;position:relative;min-height:0}
 .scene{position:absolute;inset:0;display:none;background:#000}
 .scene.on{display:block}
-.bg{
-  position:absolute;inset:0;background:url('/hero-ab-creative-world-v2.jpg') center 42%/cover no-repeat;
-}
+.bg{position:absolute;inset:0;background:url('/hero-ab-creative-world-v2.jpg') center 42%/cover no-repeat}
 .bg:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(255,140,30,.28),transparent 55%),linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.2) 45%,rgba(0,0,0,.45))}
 .center{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
 .logo{font-family:Georgia,serif;font-weight:400;letter-spacing:.28em;color:var(--gold);font-size:clamp(3.2rem,16vw,7rem);line-height:.9;text-shadow:0 8px 40px #000}
@@ -35,24 +33,17 @@ topbar, .topbar{display:flex;align-items:center;justify-content:space-between;ga
 .bar{margin-top:18px;width:min(420px,78vw);height:8px;border-radius:99px;background:#1a1a1a;border:1px solid rgba(234,217,180,.35);overflow:hidden}
 .bar>i{display:block;height:100%;width:68%;background:linear-gradient(90deg,#7a5a20,var(--gold),#ffb347)}
 .tag{margin-top:10px;color:rgba(234,217,180,.7);font-size:12px;letter-spacing:.12em}
-.live-grid{
-  position:absolute;inset:0;display:grid;
-  grid-template-columns:1fr 168px;grid-template-rows:1fr auto;
-  gap:8px;padding:10px;background:#070707;
+.watch{
+  position:absolute;inset:0;display:grid;grid-template-columns:1fr 300px;background:#070707
 }
-@media(max-width:720px){
-  .live-grid{grid-template-columns:1fr;grid-template-rows:1fr auto auto}
-  .side{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-}
-.game{
-  position:relative;border:1px solid rgba(234,217,180,.28);border-radius:12px;overflow:hidden;background:#000;min-height:0
-}
+@media(max-width:860px){.watch{grid-template-columns:1fr}.chatbox{display:none}}
+.watch iframe{width:100%;height:100%;border:0;background:#000}
+.live-grid{position:absolute;inset:0;display:grid;grid-template-columns:1fr 168px;grid-template-rows:1fr auto;gap:8px;padding:10px;background:#070707}
+@media(max-width:720px){.live-grid{grid-template-columns:1fr;grid-template-rows:1fr auto auto}.side{display:grid;grid-template-columns:1fr 1fr;gap:8px}}
+.game{position:relative;border:1px solid rgba(234,217,180,.28);border-radius:12px;overflow:hidden;background:#000;min-height:0}
 .game video{width:100%;height:100%;object-fit:cover;display:block}
 .abmark{position:absolute;top:10px;left:10px;color:var(--gold);font-family:Georgia,serif;letter-spacing:.2em;font-size:18px;text-shadow:0 2px 10px #000}
-.cam{
-  position:absolute;left:10px;bottom:10px;width:118px;height:84px;border-radius:10px;
-  border:1px solid var(--gold);background:linear-gradient(#111,#000);overflow:hidden
-}
+.cam{position:absolute;left:10px;bottom:10px;width:118px;height:84px;border-radius:10px;border:1px solid var(--gold);background:linear-gradient(#111,#000)}
 .cam span{position:absolute;inset:auto 6px 6px;font-size:9px;letter-spacing:.14em;color:var(--gold)}
 .side{display:flex;flex-direction:column;gap:8px;min-height:0}
 .panel{flex:1;border:1px solid rgba(234,217,180,.22);border-radius:12px;background:#0c0c0c;padding:10px;overflow:auto}
@@ -63,32 +54,43 @@ topbar, .topbar{display:flex;align-items:center;justify-content:space-between;ga
 .goal .row{display:flex;justify-content:space-between;color:var(--gold);font-size:11px;letter-spacing:.14em;margin-bottom:6px}
 .pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 .pill{border:1px solid rgba(234,217,180,.4);border-radius:999px;padding:10px 16px;color:var(--gold);font-size:12px;letter-spacing:.12em}
-.alert{
-  position:absolute;left:6%;top:18%;width:min(420px,86vw);z-index:5;
-  border:1px solid rgba(234,217,180,.4);border-radius:14px;padding:16px 18px;
-  background:rgba(8,8,8,.88);box-shadow:0 20px 60px #000,0 0 40px rgba(255,140,20,.15);
-  animation:in .5s ease
-}
-@keyframes in{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
+.alert{position:absolute;left:6%;top:18%;width:min(420px,86vw);z-index:5;border:1px solid rgba(234,217,180,.4);border-radius:14px;padding:16px 18px;background:rgba(8,8,8,.88)}
 .alert small{color:var(--amber);letter-spacing:.2em;font-weight:700}
 .alert strong{display:block;font-size:22px;margin-top:4px}
-.hint{position:absolute;right:10px;bottom:10px;z-index:20;font-size:11px;color:rgba(255,255,255,.45)}
+.twitch-link{color:var(--amber);font-size:12px;white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="topbar">
-  <a class="brand" href="/">AB <small>Studio preview</small></a>
+  <a class="brand" href="/">AB <small>Live</small></a>
   <div class="tabs">
-    <button class="on" data-s="soon">SOON</button>
-    <button data-s="live">LIVE</button>
+    <button class="on" data-s="watch">WATCH</button>
+    <button data-s="soon">SOON</button>
+    <button data-s="look">LOOK</button>
     <button data-s="alert">ALERT</button>
     <button data-s="brb">BRB</button>
     <button data-s="end">END</button>
   </div>
+  <a class="twitch-link" href="https://www.twitch.tv/spartaadamo" target="_blank" rel="noopener">twitch.tv/spartaadamo</a>
 </div>
 
 <div class="stage">
-  <section class="scene on" id="soon">
+  <section class="scene on" id="watch">
+    <div class="watch">
+      <iframe
+        src="https://player.twitch.tv/?channel=spartaadamo&parent=abbytes.github.io&autoplay=true"
+        allowfullscreen
+        allow="autoplay; fullscreen">
+      </iframe>
+      <iframe
+        class="chatbox"
+        src="https://www.twitch.tv/embed/spartaadamo/chat?parent=abbytes.github.io&darkpopout"
+        title="Twitch chat">
+      </iframe>
+    </div>
+  </section>
+
+  <section class="scene" id="soon">
     <div class="bg"></div>
     <div class="center">
       <div class="logo">AB</div>
@@ -100,7 +102,7 @@ topbar, .topbar{display:flex;align-items:center;justify-content:space-between;ga
     </div>
   </section>
 
-  <section class="scene" id="live">
+  <section class="scene" id="look">
     <div class="live-grid">
       <div class="game">
         <video src="/sparta_vs_abyssal_grok.mp4" autoplay muted loop playsinline></video>
@@ -113,13 +115,11 @@ topbar, .topbar{display:flex;align-items:center;justify-content:space-between;ga
           <p><b>JungleKing:</b> that view tho</p>
           <p><b>RaptorRider:</b> Spartan squad</p>
           <p><b>MythicTitan:</b> raid incoming</p>
-          <p><b>Valkyrie:</b> love the overlay</p>
         </div>
         <div class="panel">
           <h3>RECENT</h3>
           <p>FOLLOW · JungleKing</p>
           <p>SUB · Valkyrie</p>
-          <p>RAID · MythicTitan</p>
         </div>
       </div>
       <div class="goal">
@@ -144,7 +144,6 @@ topbar, .topbar{display:flex;align-items:center;justify-content:space-between;ga
       <div class="logo" style="letter-spacing:.2em;font-size:clamp(3rem,18vw,8rem)">BRB</div>
       <div class="line"></div>
       <div class="title">Be Right Back</div>
-      <div class="tag">Tip while the hunt pauses</div>
     </div>
   </section>
 
@@ -156,14 +155,13 @@ topbar, .topbar{display:flex;align-items:center;justify-content:space-between;ga
       <div class="line"></div>
       <div class="title">Thanks for watching</div>
       <div class="pills">
-        <span class="pill">FOLLOW</span>
+        <a class="pill" href="https://www.twitch.tv/spartaadamo">FOLLOW</a>
         <a class="pill" href="https://discord.gg/jezxbGAaR">DISCORD</a>
         <a class="pill" href="/tip/">TIP</a>
       </div>
     </div>
   </section>
 </div>
-<div class="hint">Preview only — tap scenes up top</div>
 <script>
 const tabs=[...document.querySelectorAll('.tabs button')];
 const scenes=[...document.querySelectorAll('.scene')];
