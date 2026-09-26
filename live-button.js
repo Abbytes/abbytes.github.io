@@ -117,6 +117,38 @@
     } catch (e) {}
   }
 
+  var TCG_URL = "https://muse.ai/s/new-tcg-jxa63shzxpxa77";
+  var TCG_NAV =
+    '<a href="' +
+    TCG_URL +
+    '" class="ab-tcg-nav whitespace-nowrap rounded-full px-3 py-2 text-xs font-medium transition sm:px-4 sm:text-sm text-white/75 hover:bg-white/10 hover:text-white" style="touch-action:manipulation">New TCG</a>';
+  var TCG_HERO =
+    '<a href="' +
+    TCG_URL +
+    '" class="ab-tcg-pill inline-flex min-h-11 items-center rounded-full bg-studio-accent px-5 py-2 text-sm font-semibold text-studio-bg shadow-glow" style="touch-action:manipulation">Play New TCG</a>';
+
+  function ensureTcgNav() {
+    if (document.querySelector("a.ab-tcg-nav")) return;
+    var nav = document.querySelector("header nav");
+    if (!nav) return;
+    var tip = Array.prototype.find.call(nav.querySelectorAll("a"), function (a) {
+      return /^\s*Tip\s*$/i.test(a.textContent || "");
+    });
+    var node = document.createElement("div");
+    node.innerHTML = TCG_NAV;
+    var link = node.firstChild;
+    if (tip) nav.insertBefore(link, tip);
+    else nav.appendChild(link);
+  }
+
+  function ensureTcgHero() {
+    var row = document.querySelector(".hero-fade-up-delay");
+    if (!row || row.querySelector("a.ab-tcg-pill")) return;
+    var wrap = document.createElement("div");
+    wrap.innerHTML = TCG_HERO;
+    row.insertBefore(wrap.firstChild, row.firstChild);
+  }
+
   function mount() {
     css();
     ensureNav();
@@ -124,6 +156,8 @@
     ensureMinerNav();
     ensureMinerHero();
     ensureMinerWork();
+    ensureTcgNav();
+    ensureTcgHero();
   }
 
   mount();
